@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arshiamk Racer - Neon Night</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="game-container">
+      <canvas id="gameCanvas"></canvas>
+      <div id="ui-layer">
+        <div id="score-board">
+          SPEED: <span id="speed-display">0</span> | DISTANCE:
+          <span id="dist-display">0</span>
+        </div>
+        <div id="start-screen" class="overlay">
+          <h1>ARSHIAMK RACER</h1>
+          <p>Use Arrow Keys to Drive</p>
+          <p class="blink">Press ENTER to Start</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/constants.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/utils.js"></script>
+    <!-- Helper math functions -->
+    <script src="js/road.js"></script>
+    <script src="js/car.js"></script>
+    <script src="js/game.js"></script>
+  </body>
+</html>
