@@ -1,26 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   overflow: hidden;
   background-color: #050510;
   color: #fff;
   font-family: "Orbitron", sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
 #game-container {
-  position: relative;
-  box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
-  border: 2px solid #0ff;
+  position: fixed;
+  inset: 0;
 }
 
 canvas {
   display: block;
-  background: #000;
 }
 
 #ui-layer {
@@ -56,6 +54,7 @@ canvas {
   border: 2px solid #ff0055;
   box-shadow: 0 0 30px #ff0055;
   border-radius: 10px;
+  max-width: 90vw;
 }
 
 h1 {

@@ -5,14 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Neon Night Racer</title>
     <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="game-container">
       <canvas id="gameCanvas"></canvas>
       <div id="ui-layer">
         <div id="score-board">
-          SPEED: <span id="speed-display">0</span> | DISTANCE:
-          <span id="dist-display">0</span>
+          SPEED: <span id="speed-display">0</span> km/h | DISTANCE:
+          <span id="dist-display">0</span> m
         </div>
         <div id="start-screen" class="overlay">
           <h1>NEON NIGHT RACER</h1>
@@ -22,13 +30,6 @@
       </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/constants.js"></script>
-    <script src="js/input.js"></script>
-    <script src="js/utils.js"></script>
-    <!-- Helper math functions -->
-    <script src="js/road.js"></script>
-    <script src="js/car.js"></script>
-    <script src="js/game.js"></script>
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>
