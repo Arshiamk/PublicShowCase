@@ -108,3 +108,12 @@ Unchanged: static files on the `main` branch served by GitHub Pages. New require
 ## Prerequisites
 
 - Meshy API key from the owner (needed only when asset generation starts; placeholders unblock all other work).
+
+## Implementation Notes (added 2026-08-09, post-build)
+
+Deviations from the design above, made during implementation:
+
+- **Music is procedural, not generated.** The connected AI audio service turned out to be speech-only (its music model is restricted to an internal pipeline), so the soundtrack is a procedural Web Audio synthwave loop — seamless by construction. `assets/audio/music.mp3` overrides it when present.
+- **Skyline is procedural filler + three Meshy landmarks.** Instanced canvas-textured buildings proved high-quality and perf-optimal for the dense skyline, so the "4–6 building variants" became three Meshy landmark buildings (tower, block, pagoda) placed as set-pieces among the procedural filler, plus the sign gantry. The barrier and streetlight props stayed procedural.
+- **Near-miss threshold widened** from the spec's implied half-car-width to |Δlat| < 3.2 m (~1.3 m edge clearance) — the literal reading left a 20 cm trigger band that was untriggerable in play.
+- **Asset budget landed at 3.5 MB** (spec allowed ~15 MB) after Draco + 1K WebP compression of 82 MB raw Meshy output.
