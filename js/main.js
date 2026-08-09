@@ -1,11 +1,17 @@
 import { World } from "./world.js";
 import { Track } from "./track.js";
 import { Vehicle } from "./vehicle.js";
+import { Traffic } from "./traffic.js";
+import { Score } from "./score.js";
+import { Hud } from "./hud.js";
 import { Input } from "./input.js";
+import { GAME } from "./config.js";
 import { clamp } from "./math.js";
 
-// Attract-mode input: the car cruises gently under the title card.
+// Synthetic inputs for non-interactive states.
 const ATTRACT_INPUT = { throttle: true, brake: false, steer: 0 };
+const BRAKE_INPUT = { throttle: false, brake: true, steer: 0 };
+const EVENTS = { nearMiss: 0, collision: false };
 
 class Game {
   constructor() {
@@ -13,15 +19,12 @@ class Game {
     this.world = new World(canvas);
     this.track = new Track(this.world.scene);
     this.vehicle = new Vehicle(this.world.scene);
+    this.traffic = new Traffic(this.world.scene, this.track);
+    this.score = new Score();
+    this.hud = new Hud();
     this.input = new Input();
-    this.state = "title"; // title → running (game over arrives with scoring)
-
-    this.el = {
-      speed: document.getElementById("speed-display"),
-      dist: document.getElementById("dist-display"),
-      startScreen: document.getElementById("start-screen"),
-    };
-    this.startS = 0;
+    this.state = "title"; // title | running | gameover
+    this.invuln = 0;
 
     this.last = performance.now();
     requestAnimationFrame((t) => this._loop(t));
@@ -29,26 +32,64 @@ class Game {
 
   _start() {
     this.state = "running";
-    this.el.startScreen.classList.add("hidden");
-    this.startS = this.vehicle.s;
+    this.hud.hideOverlays();
     this.vehicle.reset();
+    this.score.reset();
+    this.traffic.reset();
+    this.invuln = 0;
   }
 
-  // One fixed-size simulation step. Kept separate from the rAF loop so the
-  // automated smoke test can drive the game deterministically.
+  // One simulation step. Kept separate from the rAF loop so the automated
+  // smoke test can drive the game deterministically.
   step(dt) {
     if (this.state === "title") {
       ATTRACT_INPUT.throttle = this.vehicle.speed < 16;
       this.vehicle.update(ATTRACT_INPUT, dt, this.track);
       if (this.input.consumeStart()) this._start();
-    } else {
+    } else if (this.state === "running") {
+      const prevS = this.vehicle.s;
       this.vehicle.update(this.input, dt, this.track);
-      this.el.speed.textContent = Math.round(this.vehicle.kmh);
-      this.el.dist.textContent = Math.round(this.vehicle.s - this.startS);
+
+      EVENTS.nearMiss = 0;
+      EVENTS.collision = false;
+      this.traffic.update(dt, this.vehicle, this.score.difficulty, EVENTS);
+
+      this.invuln = Math.max(0, this.invuln - dt);
+      let collided = false;
+      if (EVENTS.collision && this.invuln === 0) {
+        collided = true;
+        this.invuln = GAME.invulnTime;
+        this.vehicle.speed *= GAME.collisionSpeedCut;
+        this.world.addShake(0.7);
+      }
+
+      const flags = this.score.update(dt, this.vehicle.s - prevS, {
+        nearMiss: EVENTS.nearMiss,
+        collision: collided,
+      });
+      if (flags && flags.checkpoint) {
+        this.hud.toast(`CHECKPOINT +${flags.checkpoint}s`);
+      } else if (flags && flags.nearMiss) {
+        this.hud.toast(`NEAR MISS ×${this.score.combo}`);
+      }
+
+      this.hud.update(this.vehicle.kmh, this.score);
+
+      if (this.score.over) {
+        this.state = "gameover";
+        this.hud.showGameOver(Math.round(this.score.score), this.score.best);
+      }
+    } else {
+      // Game over: the car brakes to a stop while traffic flows on.
+      this.vehicle.update(BRAKE_INPUT, dt, this.track);
+      EVENTS.nearMiss = 0;
+      EVENTS.collision = false;
+      this.traffic.update(dt, this.vehicle, this.score.difficulty, EVENTS);
+      if (this.input.consumeStart()) this._start();
     }
 
     this.track.update(this.vehicle.s);
-    this.world.updateCamera(this.track, this.vehicle);
+    this.world.updateCamera(this.track, this.vehicle, dt);
   }
 
   _loop(now) {

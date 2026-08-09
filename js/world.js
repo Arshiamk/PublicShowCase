@@ -34,6 +34,7 @@ export class World {
 
     this._buildLights();
     this._buildSky();
+    this.shake = 0;
 
     this.resize();
     window.addEventListener("resize", () => this.resize());
@@ -125,10 +126,19 @@ export class World {
     return tex;
   }
 
-  updateCamera(track, vehicle) {
+  addShake(amount) {
+    this.shake = Math.min(this.shake + amount, 1);
+  }
+
+  updateCamera(track, vehicle, dt) {
     const s = vehicle.s;
     track.posAt(s - CAMERA.back, vehicle.lat * 0.5, this.camera.position);
     this.camera.position.y += CAMERA.height;
+    if (this.shake > 0.001) {
+      this.camera.position.x += (Math.random() - 0.5) * this.shake * 1.6;
+      this.camera.position.y += (Math.random() - 0.5) * this.shake * 0.9;
+      this.shake *= Math.exp(-5 * dt);
+    }
     track.posAt(s + CAMERA.lookAhead, vehicle.lat * 0.8, _look);
     _look.y += 1.6;
     this.camera.lookAt(_look);

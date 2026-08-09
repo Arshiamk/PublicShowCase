@@ -66,6 +66,37 @@ export const RENDER = {
   exposure: 1.15,
 };
 
+export const TRAFFIC = {
+  count: 14, // pool size
+  targetMin: 4, // active cars at difficulty 0
+  targetMax: 10, // active cars at difficulty 1
+  spawnNear: 380, // spawn window ahead of the player (meters)
+  spawnFar: 520,
+  despawnBehind: 40,
+  despawnAhead: 620,
+  speedMin: 17, // m/s cruise band
+  speedMax: 28,
+  diffSpeedBonus: 8, // extra cruise speed at full difficulty
+  followDist: 15, // match speed of a same-lane car closer than this
+  halfW: 0.95,
+  halfL: 2.3,
+};
+
+export const GAME = {
+  startTime: 60, // seconds
+  checkpointEvery: 1000, // meters
+  checkpointBonus: 20, // seconds granted at difficulty 0...
+  checkpointBonusMin: 9, // ...ramping down to this at difficulty 1
+  nearMissLat: 3.2, // max |dlat| that still counts as a near-miss (~1.3 m clearance)
+  nearMissPoints: 100,
+  comboMax: 10,
+  comboWindow: 5, // seconds without a near-miss before the combo decays
+  pointsPerMeter: 1,
+  collisionSpeedCut: 0.4, // speed multiplier applied on impact
+  invulnTime: 1.2, // seconds of post-collision grace
+  difficultyRampDist: 8000, // meters to reach full difficulty
+};
+
 export const COLORS = {
   sky: 0x07071a,
   fog: 0x0a0a22,

@@ -18,14 +18,24 @@
     <div id="game-container">
       <canvas id="gameCanvas"></canvas>
       <div id="ui-layer">
-        <div id="score-board">
-          SPEED: <span id="speed-display">0</span> km/h | DISTANCE:
-          <span id="dist-display">0</span> m
+        <div id="hud">
+          <div class="stat">SPEED <span id="speed-display">0</span></div>
+          <div class="stat">SCORE <span id="score-display">0</span></div>
+          <div class="stat" id="time-stat">TIME <span id="time-display">60</span></div>
+          <div class="stat" id="combo-stat">COMBO ×<span id="combo-display">1</span></div>
         </div>
+        <div id="toast" class="hidden"></div>
         <div id="start-screen" class="overlay">
           <h1>NEON NIGHT RACER</h1>
           <p>Use Arrow Keys or WASD to Drive</p>
+          <p>Weave through traffic — near misses build your combo</p>
           <p class="blink">Press ENTER to Start</p>
+        </div>
+        <div id="game-over" class="overlay hidden">
+          <h1>RUN OVER</h1>
+          <p>SCORE: <span id="final-score">0</span></p>
+          <p>BEST: <span id="best-score">0</span></p>
+          <p class="blink">Press ENTER to Retry</p>
         </div>
       </div>
     </div>
