@@ -361,11 +361,17 @@ export class Track {
   setAssets(assets) {
     const names = ["building-tower", "building-block", "building-pagoda"];
     this.landmarks = [];
+    const box = new THREE.Box3();
+    const size = new THREE.Vector3();
     for (let i = 0; i < 4; i++) {
       const obj = assets.building(names[i % names.length], 52 + (i % 3) * 9);
       if (!obj) continue;
       obj.visible = false;
       obj.userData.id = null;
+      // Widest horizontal extent, so placement can keep it off the road.
+      box.setFromObject(obj);
+      box.getSize(size);
+      obj.userData.halfW = Math.max(size.x, size.z) / 2;
       this.scene.add(obj);
       this.landmarks.push(obj);
     }
@@ -398,7 +404,8 @@ export class Track {
         obj.visible = true;
         const side = r > 0.65 ? 1 : -1;
         const s = id * SP + SP / 2;
-        const lat = side * (30 + hash01(id * 13 + 6) * 14);
+        const lat =
+          side * (20 + obj.userData.halfW + hash01(id * 13 + 6) * 14);
         this.posAt(s, lat, obj.position);
         obj.position.y -= 1.5;
         obj.rotation.y = this.yawAt(s) + (hash01(id * 13 + 7) - 0.5) * 0.5;

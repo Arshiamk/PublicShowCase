@@ -131,6 +131,11 @@ export class Vehicle {
     glow.position.set(0, 0.4, -0.5);
     g.add(glow);
 
+    // Cool "hero light" from above-behind so the body reads at night
+    const hero = new THREE.PointLight(0xaabbff, 55, 16, 2);
+    hero.position.set(0, 4.2, -3.5);
+    g.add(hero);
+
     // Headlight beam
     const beam = new THREE.SpotLight(0xcfefff, 500, 150, 0.45, 0.7, 2);
     beam.position.set(0, 1.2, 1.5);
