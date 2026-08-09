@@ -2,10 +2,12 @@ import { World } from "./world.js";
 import { Track } from "./track.js";
 import { Vehicle } from "./vehicle.js";
 import { Traffic } from "./traffic.js";
+import { Assets } from "./assets.js";
 import { Score } from "./score.js";
 import { Hud } from "./hud.js";
 import { Input } from "./input.js";
-import { GAME } from "./config.js";
+import { GameAudio } from "./audio.js";
+import { GAME, CAR } from "./config.js";
 import { clamp } from "./math.js";
 
 // Synthetic inputs for non-interactive states.
@@ -25,6 +27,20 @@ class Game {
     this.input = new Input();
     this.state = "title"; // title | running | gameover
     this.invuln = 0;
+
+    // Audio starts on the first user gesture (browser autoplay policy).
+    this.audio = new GameAudio();
+    window.addEventListener("keydown", () => this.audio.unlock(), {
+      once: true,
+    });
+
+    // Generated models stream in behind the placeholders.
+    this.assets = new Assets();
+    this.assets.load().then(() => {
+      this.vehicle.applyModel(this.assets);
+      this.traffic.applyModels(this.assets);
+      this.track.setAssets(this.assets);
+    });
 
     this.last = performance.now();
     requestAnimationFrame((t) => this._loop(t));
@@ -61,7 +77,9 @@ class Game {
         this.invuln = GAME.invulnTime;
         this.vehicle.speed *= GAME.collisionSpeedCut;
         this.world.addShake(0.7);
+        this.audio.impact();
       }
+      if (EVENTS.nearMiss > 0) this.audio.whoosh();
 
       const flags = this.score.update(dt, this.vehicle.s - prevS, {
         nearMiss: EVENTS.nearMiss,
@@ -69,6 +87,7 @@ class Game {
       });
       if (flags && flags.checkpoint) {
         this.hud.toast(`CHECKPOINT +${flags.checkpoint}s`);
+        this.audio.chime();
       } else if (flags && flags.nearMiss) {
         this.hud.toast(`NEAR MISS ×${this.score.combo}`);
       }
@@ -87,6 +106,9 @@ class Game {
       this.traffic.update(dt, this.vehicle, this.score.difficulty, EVENTS);
       if (this.input.consumeStart()) this._start();
     }
+
+    if (this.input.consumeMute()) this.audio.toggleMute();
+    this.audio.updateEngine(this.vehicle.speed / CAR.maxSpeed);
 
     this.track.update(this.vehicle.s);
     this.world.updateCamera(this.track, this.vehicle, dt);

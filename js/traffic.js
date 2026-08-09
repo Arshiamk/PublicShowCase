@@ -23,6 +23,7 @@ export class Traffic {
         prevDs: 0,
         passed: false,
         group,
+        bodyParts: group.userData.bodyParts,
       });
     }
   }
@@ -73,7 +74,21 @@ export class Traffic {
     );
     head.position.set(0, 0.65, 2.2);
     g.add(head);
+    g.userData.bodyParts = [body, cabin]; // swapped out when models load
     return g;
+  }
+
+  // Swap placeholder bodies for generated traffic models, keeping the
+  // emissive light bars that make cars readable at night.
+  applyModels(assets) {
+    const names = ["traffic-sedan", "traffic-suv", "traffic-taxi", "traffic-van"];
+    this.cars.forEach((c, i) => {
+      const model = assets.vehicle(names[i % names.length], 4.4);
+      if (!model) return;
+      for (const part of c.bodyParts) c.group.remove(part);
+      c.bodyParts = [];
+      c.group.add(model);
+    });
   }
 
   _laneLat(lane) {

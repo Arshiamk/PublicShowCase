@@ -41,13 +41,19 @@ export class Vehicle {
       roughness: 0.9,
     });
 
+    // Body parts are placeholders swapped out when the hero model loads;
+    // the neon overlays (lights, plate, exhausts) below are permanent.
+    this.bodyParts = [];
+
     const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.55, 4.3), body);
     chassis.position.y = 0.55;
     g.add(chassis);
+    this.bodyParts.push(chassis);
 
     const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.5, 2.0), glass);
     cabin.position.set(0, 1.05, -0.15);
     g.add(cabin);
+    this.bodyParts.push(cabin);
 
     const splitter = new THREE.Mesh(
       new THREE.BoxGeometry(1.95, 0.18, 0.7),
@@ -55,6 +61,7 @@ export class Vehicle {
     );
     splitter.position.set(0, 0.3, 2.0);
     g.add(splitter);
+    this.bodyParts.push(splitter);
 
     const wheelGeo = new THREE.CylinderGeometry(0.33, 0.33, 0.28, 14);
     wheelGeo.rotateZ(Math.PI / 2);
@@ -67,6 +74,7 @@ export class Vehicle {
       const wheel = new THREE.Mesh(wheelGeo, dark);
       wheel.position.set(x, 0.33, z);
       g.add(wheel);
+      this.bodyParts.push(wheel);
     }
 
     // Neon taillight bar (rear = -z; the camera mostly sees this)
@@ -145,6 +153,16 @@ export class Vehicle {
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     return tex;
+  }
+
+  // Swap the placeholder body for the generated hero model, keeping the
+  // neon overlays in place.
+  applyModel(assets) {
+    const model = assets.vehicle("hero-car", 4.4);
+    if (!model) return;
+    for (const part of this.bodyParts) this.group.remove(part);
+    this.bodyParts = [];
+    this.group.add(model);
   }
 
   reset() {

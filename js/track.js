@@ -354,6 +354,73 @@ export class Track {
     this.heads.instanceMatrix.needsUpdate = true;
   }
 
+  // --- Generated landmarks ------------------------------------------------
+
+  // Pools of generated set-pieces (skyline landmarks and sign gantries)
+  // recycled along the road among the instanced procedural filler.
+  setAssets(assets) {
+    const names = ["building-tower", "building-block", "building-pagoda"];
+    this.landmarks = [];
+    for (let i = 0; i < 4; i++) {
+      const obj = assets.building(names[i % names.length], 52 + (i % 3) * 9);
+      if (!obj) continue;
+      obj.visible = false;
+      obj.userData.id = null;
+      this.scene.add(obj);
+      this.landmarks.push(obj);
+    }
+    this.gantries = [];
+    for (let i = 0; i < 2; i++) {
+      const obj = assets.span("prop-gantry", 26);
+      if (!obj) continue;
+      obj.visible = false;
+      obj.userData.id = null;
+      this.scene.add(obj);
+      this.gantries.push(obj);
+    }
+  }
+
+  _updateLandmarks(playerS) {
+    const n = this.landmarks ? this.landmarks.length : 0;
+    if (n) {
+      const SP = 450;
+      const first = Math.floor(playerS / SP);
+      for (let k = 0; k < n; k++) {
+        const id = first + k;
+        const obj = this.landmarks[((id % n) + n) % n];
+        if (obj.userData.id === id) continue;
+        obj.userData.id = id;
+        const r = hash01(id * 13 + 5);
+        if (r < 0.3) {
+          obj.visible = false; // deterministic gaps
+          continue;
+        }
+        obj.visible = true;
+        const side = r > 0.65 ? 1 : -1;
+        const s = id * SP + SP / 2;
+        const lat = side * (30 + hash01(id * 13 + 6) * 14);
+        this.posAt(s, lat, obj.position);
+        obj.position.y -= 1.5;
+        obj.rotation.y = this.yawAt(s) + (hash01(id * 13 + 7) - 0.5) * 0.5;
+      }
+    }
+    const gn = this.gantries ? this.gantries.length : 0;
+    if (gn) {
+      const SP = 700;
+      const first = Math.floor(playerS / SP);
+      for (let k = 0; k < gn; k++) {
+        const id = first + k;
+        const obj = this.gantries[((id % gn) + gn) % gn];
+        if (obj.userData.id === id) continue;
+        obj.userData.id = id;
+        const s = id * SP + 350;
+        this.posAt(s, 0, obj.position);
+        obj.rotation.y = this.yawAt(s);
+        obj.visible = true;
+      }
+    }
+  }
+
   // --- Per-frame ----------------------------------------------------------
 
   // Keep the chunk pool covering [player - 1 chunk, player + N-1 chunks].
@@ -367,5 +434,6 @@ export class Track {
       const chunk = this.chunks[poolSlot];
       if (chunk.idx !== want) this._rebuildChunk(chunk, want, poolSlot);
     }
+    this._updateLandmarks(playerS);
   }
 }

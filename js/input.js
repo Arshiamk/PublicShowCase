@@ -16,6 +16,7 @@ export class Input {
     this.left = false;
     this.right = false;
     this._startPressed = false;
+    this._mutePressed = false;
 
     window.addEventListener("keydown", (e) => this._onKey(e, true));
     window.addEventListener("keyup", (e) => this._onKey(e, false));
@@ -28,6 +29,8 @@ export class Input {
       e.preventDefault();
     } else if (e.code === "Enter" && down) {
       this._startPressed = true;
+    } else if (e.code === "KeyM" && down) {
+      this._mutePressed = true;
     }
   }
 
@@ -39,6 +42,12 @@ export class Input {
   consumeStart() {
     const pressed = this._startPressed;
     this._startPressed = false;
+    return pressed;
+  }
+
+  consumeMute() {
+    const pressed = this._mutePressed;
+    this._mutePressed = false;
     return pressed;
   }
 }
