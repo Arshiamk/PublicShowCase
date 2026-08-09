@@ -153,3 +153,49 @@ p {
 .hidden {
   display: none !important;
 }
+
+.overlay {
+  pointer-events: auto; /* overlays double as tap-to-start on touch */
+}
+
+#touch-controls {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 4vw 5vw;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  #touch-controls {
+    display: flex;
+  }
+}
+
+.tcluster {
+  display: flex;
+  gap: 4vw;
+}
+
+.tbtn {
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 17vw;
+  padding: 4.5vw 3vw;
+  text-align: center;
+  font-size: 5vw;
+  color: #0ff;
+  text-shadow: 0 0 10px #0ff;
+  background: rgba(0, 20, 30, 0.45);
+  border: 1px solid rgba(0, 255, 255, 0.6);
+  border-radius: 12px;
+}
+
+.tbtn.held {
+  background: rgba(0, 255, 255, 0.25);
+}

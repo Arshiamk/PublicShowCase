@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Neon Night Racer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>"
+    />
     <link rel="stylesheet" href="style.css" />
     <script type="importmap">
       {
@@ -36,6 +40,16 @@
           <p>SCORE: <span id="final-score">0</span></p>
           <p>BEST: <span id="best-score">0</span></p>
           <p class="blink">Press ENTER to Retry</p>
+        </div>
+        <div id="touch-controls">
+          <div class="tcluster">
+            <div class="tbtn" data-action="left">◀</div>
+            <div class="tbtn" data-action="right">▶</div>
+          </div>
+          <div class="tcluster">
+            <div class="tbtn" data-action="brake">BRAKE</div>
+            <div class="tbtn" data-action="throttle">GAS</div>
+          </div>
         </div>
       </div>
     </div>

@@ -30,9 +30,9 @@ class Game {
 
     // Audio starts on the first user gesture (browser autoplay policy).
     this.audio = new GameAudio();
-    window.addEventListener("keydown", () => this.audio.unlock(), {
-      once: true,
-    });
+    const unlock = () => this.audio.unlock();
+    window.addEventListener("keydown", unlock, { once: true });
+    window.addEventListener("pointerdown", unlock, { once: true });
 
     // Generated models stream in behind the placeholders.
     this.assets = new Assets();

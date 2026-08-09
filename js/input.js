@@ -20,6 +20,30 @@ export class Input {
 
     window.addEventListener("keydown", (e) => this._onKey(e, true));
     window.addEventListener("keyup", (e) => this._onKey(e, false));
+    this._bindTouch();
+  }
+
+  _bindTouch() {
+    const root = document.getElementById("touch-controls");
+    if (!root) return;
+    for (const btn of root.querySelectorAll("[data-action]")) {
+      const action = btn.dataset.action;
+      const set = (v) => (e) => {
+        e.preventDefault();
+        this[action] = v;
+        btn.classList.toggle("held", v);
+      };
+      btn.addEventListener("pointerdown", set(true));
+      btn.addEventListener("pointerup", set(false));
+      btn.addEventListener("pointercancel", set(false));
+      btn.addEventListener("pointerleave", set(false));
+    }
+    // Tapping a start/game-over overlay acts as Enter.
+    for (const ov of document.querySelectorAll(".overlay")) {
+      ov.addEventListener("pointerdown", () => {
+        this._startPressed = true;
+      });
+    }
   }
 
   _onKey(e, down) {
